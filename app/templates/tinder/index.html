@@ -1,0 +1,45 @@
+{% extends 'tinder/base.html' %}
+
+{% block cards %}
+  {% for profile in profiles %}
+  <div class="card" id="{{profile['user']['_id']}}">
+    <header>
+      <div class="name">{{profile['user']['name']}}</div>
+      <div class="age">{{ get_age(profile['user']['birth_date']) }}</div>
+      <div class="short-details">
+        <div class="school"></div>
+        <div class="job"></div>
+        <div class="distance"><span>{{distance(profile['distance_mi'])}}km</span></div>
+      </div>
+    </header>
+    <div class="image-container">
+      {% for photo in profile['user']['photos'] %}
+        <img class="profile-photo" src="{{photo['url']}}" alt="{{profile['user']['name']}}" loading="lazy" >
+      {% endfor %}
+    </div>
+    {% if profile['user']['bio'] != "" %}
+    <div class="bio">
+      {{profile['user']['bio']}}
+    </div>
+    {% endif %}
+    <div class="other">
+      {% if 'instagram' is in profile %}
+      <div class="instagram">
+        <div class="instagram-images">
+          {% for image in profile['instagram']['photos'] %}
+            <div class="instagram-image">
+              <img src="{{image['thumbnail']}}" alt="IG photo" loading="lazy" >
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="actions">
+      <div class="dislike">🙅‍♂️</div>
+      <div class="superlike">😍</div>
+      <div class="like">👍</div>
+    </div>
+  </div>
+  {% endfor %}
+{% endblock %}

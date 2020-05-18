@@ -1,0 +1,27 @@
+{% extends 'tinder/base.html' %}
+
+{% block cards %}
+{{g.total_count}}
+  {% for profile in profiles %}
+  <div class="card" id="{{profile.id}}">
+    <header>
+      <div class="age">{{ profile.age }}</div>
+    </header>
+    <div class="image-container">
+      {% for photo in parse_photos(profile.photos) %}
+        <img class="profile-photo" src="{{photo}}" loading="lazy" >
+      {% endfor %}
+    </div>
+    {% if profile.bio != "" %}
+    <div class="bio">
+      {{profile.bio}}
+    </div>
+    {% endif %}
+    <div class="actions">
+      <div class="dislike">🙅‍♂️</div>
+      <div class="superlike">😍</div>
+      <div class="like">👍</div>
+    </div>
+  </div>
+  {% endfor %}
+{% endblock %}

@@ -1,2 +1,4 @@
 pylint
 flask
+tinder-token
+git+https://github.com/fbessez/Tinder/

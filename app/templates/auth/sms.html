@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h2>{% block title %}Log In{% endblock %}</h2>
+{% endblock %}
+
+{% block content %}
+  <form method=post>
+    <div>
+      <label for=phone_number>Phone Number</label>
+      <input type=tel name=phone_number id=phone_number required>
+    </div>
+    <div>
+      <input type=submit value=Submit>
+    </div>
+  </form>
+{% endblock %}

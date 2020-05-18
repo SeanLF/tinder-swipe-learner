@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h2>{% block title %}Log In{% endblock %}</h2>
+{% endblock %}
+
+{% block content %}
+  <form method=post>
+    <div>
+      <label for=otp_code>SMS code</label>
+      <input type=number name=otp_code id=otp_code required>
+    </div>
+    <div>
+      <input type=submit value=Submit>
+    </div>
+  </form>
+{% endblock %}
