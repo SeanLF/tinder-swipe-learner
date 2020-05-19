@@ -9,6 +9,7 @@ setup(
     install_requires=[
         'flask',
         'tinder-token',
-        'git+https://github.com/fbessez/Tinder/'
+        'git+https://github.com/fbessez/Tinder/',
+        'requests',
     ],
 )

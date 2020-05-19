@@ -5,22 +5,26 @@
 <aside class="aside">
   <nav>
     <div class="navbar">
-      <div class="profile">
-        <img src="" alt="My Profile">
-        <span>My Profile</span>
+      <div class="my-profile">
+        <img src="{{g.user_profile['photo']['url']}}" alt="My Profile" height="{{g.user_profile['photo']['height']}}" width="{{g.user_profile['photo']['width']}}">
+        <span class="my-profile__header">My Profile</span>
       </div>
     </div>
     <div class="aside-navbar">
-      <div class="matches">
+      <div class="matches" aria-selected="true">
         <span>Matches</span>
-        {% if match_count > 0 %}
-        <span>{{match_count}}</span>
+        {% if g.match_count > 0 %}
+          {% if g.match_count == 99 %}
+            <span class="match-count">99+</span>
+          {% else %}
+            <span class="match-count">{{g.match_count}}<0pan>
+          {% endif %}
         {% endif %}
       </div>
       <div class="messages">
         <span>Messages</span>
-        {% if message_count > 0 %}
-        <span>{{message_count}}</span>
+        {% if g.message_count > 0 %}
+        <span class="message-count">{{g.message_count}}</span>
         {% endif %}
       </div>
     </div>
@@ -39,32 +43,3 @@
     <div class="next-photo">▭ Next photo</div>
   </div>
 </main>
-
-<script type="text/javascript">
-
-  actions = document.getElementsByClassName('actions');
-  for(i=0; i<actions.length; i++){
-    actions[i].addEventListener('click', event => {
-        event.preventDefault();
-        tinder_action(event, {'id': event.target.parentElement.parentElement.id, 'action': event.target.className})
-    });
-  }
-
-  function tinder_action(event, data) {
-    fetch("{{tinder_action_url}}", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {"content-type": "application/json"},
-    }).then(function(res) {
-      if (res.ok) { // ok if status is 2xx
-        event.target.parentElement.parentElement.remove();
-        if (document.getElementsByClassName('card-container')[0].childElementCount === 0) {
-          location.reload();
-        }
-      } else {
-        console.log('Request failed.  Returned status of ' + res.status);
-      }
-      return res.blob()
-    })
-  }
-</script>

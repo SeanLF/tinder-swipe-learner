@@ -1,8 +1,11 @@
 html{
-  --background-color: #eee;
+  --background-color: #f5f7fa;
   --background-color-card: white;
-  --background-color-tinder: linear-gradient(262deg, rgb(255, 120, 84), rgb(253, 38, 125));
-  --text-color: black;
+  --background-image-tinder: linear-gradient(262deg, rgb(255, 120, 84), rgb(253, 38, 125));
+  --background-color-tinder: rgb(253, 80, 104);
+  --border-color: rgb(224, 228, 233);
+  --text-color: rgb(44, 44, 44);
+  --text-color-light: rgb(84, 84, 84);
   --text-color-flipped: white;
   font-family: ProximaNova, sans-serif;
   font-size: 100%;
@@ -12,4 +15,9 @@ body{
   background-color: var(--background-color);
   display: flex;
   flex-flow: column nowrap;
+  color: var(--text-color);
+}
+.hidden{
+  visibility: hidden;
+  display: none;
 }

@@ -1,6 +1,7 @@
 body{
   flex-flow: row;
 }
+/* SIDEBAR -------- */
 .aside{
   width: 25vw;
   display: flex;
@@ -10,21 +11,56 @@ body{
   height: 100vw;
 }
 .aside .navbar{
-  background-image: var(--background-color-tinder);
+  background-image: var(--background-image-tinder);
   color: var(--text-color-flipped);
-  padding: 1rem;
-  font-size: 1.2rem;
+  padding: 1.2rem 1.4rem;
+  font-size: 1.4rem;
+  box-shadow: 0 1px 8px 0 rgba(0,17,25,.27);
+}
+.my-profile{
+  display: flex;
+  align-items: center;
+}
+.my-profile img {
+  border-radius: 50%;
+  height: 2rem;
+  width: 2rem;
+  border: 2px solid white;
+  margin-right: 1rem;
+  box-shadow: 0 1px 5px 0 hsla(0,0%,42.7%,.56);
+}
+.my-profile__header{
+  font-weight: lighter;
 }
 .aside-navbar{
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-evenly;
-  padding: 0.5rem;
+  padding: 1rem 0;
 }
+.matches, .messages{
+  cursor: pointer;
+}
+.matches[aria-selected=true], .messages[aria-selected=true]{
+  padding-bottom: 0.2rem;
+  border-bottom: 0.2rem solid var(--background-color-tinder);
+}
+.matches span:first-child, .messages span:first-child{
+  font-weight: bold;
+}
+.match-count, .message-count{
+  background-color: var(--background-color-tinder);
+  border-radius: 5rem;
+  padding: 0.2rem 0.4rem;
+  color: var(--text-color-flipped);
+  font-size: 0.8rem;
+}
+/* MAIN APP */
 .main {
   position: relative;
   width: 75vw;
   left: 25vw;
+  border-left: 1px solid var(--border-color);
 }
 .card-container{
   display: flex;
@@ -32,39 +68,76 @@ body{
   background-color: var(--background-color);
 }
 .card{
-  max-width: 50vw;
-  margin: 3vh auto;
-  padding: 2vh 1rem;
-  background-color: var(--background-color-card);
+  max-width: 25vw;
+  margin: 1rem auto;
   border-radius: 0.5rem;
-  margin-bottom: 7rem;
   box-shadow: 0 2px 10px 0 rgba(84,84,84,0.77);
+  min-height: 75vh;
+  background-position: center;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  display: flex;
+  flex-flow: column nowrap;
+  background-color: var(--background-color-tinder);
 }
-.card > header {
+.photo-count-container{
+  display: flex;
+  flex-flow: row wrap;
+  padding: 0.5rem;
+}
+.photo-count-container > button{
+  flex: 1;
+  opacity: 0.5;
+  background-color: white;
+  border-style: none;
+  border: 0 !important;
+  height: 0.2rem;
+  border-radius: 1rem;
+  margin: 0.1rem;
+  cursor: pointer;
+}
+.photo-buttons {
+  visibility: hidden;
+  flex: 1;
+}
+.card:hover .photo-buttons{
+  display: flex;
+  visibility: initial;
+  cursor: pointer;
+  align-items: stretch;
+}
+.image-left, .image-right{
+  display: inline-flex;
+  flex: 1;
+  user-select: none;
+  align-items: center;
+}
+.image-right{
+  justify-content: right;
+}
+.card__header{
+  color: var(--text-color-flipped);
   display: flex;
   flex-flow: row;
-  justify-content: space-between;
-}
-.image-container, .instagram-images{
-  overflow: scroll;
-  display: flex;
-  flex-flow: row nowrap;
+  padding: 1rem;
 }
 .profile-photo{
   height: 75vh;
 }
 .bio{
-  margin: 1rem;
+  padding: 1rem;
 }
-.instagram-images img{
+.instagram .photo-container{
+  overflow: scroll;
+  display: flex;
+  flex-flow: row nowrap;
+}
+.instagram .photo-container .isntagram-photo img{
   height: 150px;
 }
 .actions{
   display: flex;
   justify-content: center;
-  position: relative;
-  height: 0;
-  bottom: -1.5rem;
 }
 .actions > div {
   cursor: pointer;
@@ -79,6 +152,7 @@ body{
   transition-timing-function: ease;
   transition-duration: .25s;
   user-select: none;
+  box-shadow: 0 2px 6px 0 rgba(112,125,134,0.14);
 }
 .actions > div:hover{
   transform: scale(1.1);
@@ -95,4 +169,5 @@ body{
 }
 .keyboard-shortcuts div {
   margin-right: 1rem;
+  color: var(--text-color-light);
 }

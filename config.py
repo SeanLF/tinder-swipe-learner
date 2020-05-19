@@ -1,4 +1,3 @@
 FLASK_ENV = 'development'
-
 host = 'https://api.gotinder.com'
-tinder_token = '0cf85a50-8fd6-42a9-baad-72855aaa8a70'
+tinder_token = '9f67d7eb-b740-405b-8ac8-d62fc749b7bb'

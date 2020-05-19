@@ -1,39 +1,31 @@
 {% extends 'tinder/base.html' %}
 
 {% block cards %}
-  {% for profile in profiles %}
-  <div class="card" id="{{profile['user']['_id']}}">
-    <header>
-      <div class="name">{{profile['user']['name']}}</div>
-      <div class="age">{{ get_age(profile['user']['birth_date']) }}</div>
-      <div class="short-details">
-        <div class="school"></div>
-        <div class="job"></div>
-        <div class="distance"><span>{{distance(profile['distance_mi'])}}km</span></div>
+  <div class="profile" aria-valuenow="{{g.profile.id}}">
+    <div class="card" style="background-image: url({{g.profile.photos[0]}});" aria-colindex="0"> <!-- should contain first image as background -->
+      <div class="photo-count-container"></div>
+      <div class="photo-buttons">
+        <div class="image-left">👈</div>
+        <div class="image-right">👉</div>
       </div>
-    </header>
-    <div class="image-container">
-      {% for photo in profile['user']['photos'] %}
-        <img class="profile-photo" src="{{photo['url']}}" alt="{{profile['user']['name']}}" loading="lazy" >
-      {% endfor %}
-    </div>
-    {% if profile['user']['bio'] != "" %}
-    <div class="bio">
-      {{profile['user']['bio']}}
-    </div>
-    {% endif %}
-    <div class="other">
-      {% if 'instagram' is in profile %}
-      <div class="instagram">
-        <div class="instagram-images">
-          {% for image in profile['instagram']['photos'] %}
-            <div class="instagram-image">
-              <img src="{{image['thumbnail']}}" alt="IG photo" loading="lazy" >
+      <div class="card__header"> <!-- contains name, age, distance -->
+        <div class="name">{{g.profile.name}}</div>
+        <div class="age">{{g.profile.age}}</div>
+        <div class="distance">{{g.profile.distance}}</div>
+      </div>
+      <div class='card__content {% if g.profile.bio == "" and g.profile.instagram.photos == [] %}hidden{% endif %}'>
+        <details>
+          <div class='bio {% if g.profile.bio == "" %}hidden{% endif %}'>
+            {{g.profile.bio}}
+          </div>
+          <div class="instagram {% if g.profile.instagram.photos == [] %}hidden{% endif %}">
+            <div class="photo-container"> <!-- scrollable -->
+              <div class="instagram-photo">
+              </div>
             </div>
-          {% endfor %}
-        </div>
+          </div>
+        </details> 
       </div>
-      {% endif %}
     </div>
     <div class="actions">
       <div class="dislike">🙅‍♂️</div>
@@ -41,5 +33,161 @@
       <div class="like">👍</div>
     </div>
   </div>
-  {% endfor %}
+  <script>
+    // --------- GETTING DATA FROM TINDER ---------
+
+    function get_next_profile(){
+      fetch("{{tinder_fetch_profile_url}}")
+      .then((resp) => resp.json())
+      .then((data) => {
+        document.profile = data;
+        setup_profile()
+      });
+    }
+
+    // --------- PRESENTATION LOGIC ---------
+    Number.prototype.mod = function(n) { // src https://stackoverflow.com/questions/4467539/javascript-modulo-gives-a-negative-result-for-negative-numbers
+      return ((this%n)+n)%n;
+    };
+
+    function preload_next_image(idx){
+      index = Number(idx+1).mod(document.profile.photos.length); // in case
+      img=new Image();
+      img.src=document.profile.photos[index];
+    }
+
+    function go_to_image(idx){
+      index = Number(idx).mod(document.profile.photos.length); // in case
+      get_card().style = `background-image: url(${document.profile.photos[index]})`;
+      get_card().setAttribute('aria-colindex', index);
+      preload_next_image(index);
+    }
+
+    function get_card(){
+      return document.getElementsByClassName('card')[0];
+    }
+
+    function get_current_image_index(){
+      return parseInt(get_card().attributes['aria-colindex'].value);
+    }
+
+    profile_el = document.getElementsByClassName('profile')[0]
+    name_el = document.getElementsByClassName('name')[0]
+    age_el = document.getElementsByClassName('age')[0]
+    distance_el = document.getElementsByClassName('distance')[0]
+    photo_count_container = document.getElementsByClassName('photo-count-container')[0];
+    photo_buttons = document.getElementsByClassName('photo-buttons')[0];
+    card_content = document.getElementsByClassName('card__content')[0];
+    details_el = document.getElementsByClassName('card__content')[0].children[0];
+    bio_el = document.getElementsByClassName('bio')[0]
+    instagram_container_el = document.getElementsByClassName('instagram.photo-container')[0]
+    left_button = photo_buttons.children[0];
+    right_button = photo_buttons.children[1];
+
+    function setup_picture_carousel_buttons(){
+      photo_count_container.innerHTML = ''
+      for(i=0;i<document.profile.photos.length; i++){
+        el = document.createElement('button');
+        el.setAttribute('aria-colspan', i);
+        photo_count_container.appendChild(el);
+
+        // on click button
+        el.addEventListener('click', event => {
+          go_to_image(parseInt(event.target.attributes['aria-colspan'].value));
+        });
+      }
+    }
+
+    function setup_profile(){
+      profile_el.setAttribute('aria-valuenow', document.profile.id)
+      setup_picture_carousel_buttons()
+      photo_count_container.setAttribute('aria-colcount', document.profile.photos.length);
+      go_to_image(0);
+      name_el.textContent = document.profile.name
+      age_el.textContent = document.profile.age
+      distance_el.textContent = document.profile.distance
+      bio_el.textContent = document.profile.bio
+      // instagram set elements
+      if (document.profile.bio == ""){
+        card_content.classList.add('hidden')
+        bio_el.classList.add('hidden');
+      } else if (document.profile.bio != ""){
+        card_content.classList.remove('hidden')
+        bio_el.classList.remove('hidden');
+      }
+    }
+
+    function initialize_keyboard_event_listeners(){
+      
+      document.addEventListener('keydown', (event) => {
+        const keyName = event.key;
+
+        switch (event.key) {
+          case "Down": // IE/Edge specific value
+          case "ArrowDown":
+          case "Up": // IE/Edge specific value
+          case "ArrowUp":
+            details_el.open = !details_el.open;
+            break;
+          case "Left": // IE/Edge specific value
+          case "ArrowLeft":
+            tinder_action({'id': profile_el.attributes['aria-valuenow'].value, 'action': 'dislike'})
+            break;
+          case "Right": // IE/Edge specific value
+          case "ArrowRight":
+            tinder_action({'id': profile_el.attributes['aria-valuenow'].value, 'action': 'like'})
+            break;
+          case "Enter":
+            tinder_action({'id': profile_el.attributes['aria-valuenow'].value, 'action': 'superlike'})
+            break;
+          case "(Space character)": // IE/Edge specific value
+          case " ":
+            right_button.click()
+            break;
+          default:
+            return
+          event.preventDefault();
+        }
+      }, false);
+    }
+
+    function __init__(){
+      document.profile = {{g.profile|tojson}};
+      setup_profile()
+
+      photo_buttons.addEventListener('click', (event) => {
+        direction = event.target == left_button ? -1 : 1;
+        go_to_image(get_current_image_index() + direction)
+      });
+
+      initialize_keyboard_event_listeners();
+    }
+
+      __init__();
+
+    // --------- ACTIONS ---------
+
+    actions = document.getElementsByClassName('actions');
+    for(i=0; i<actions.length; i++){
+      actions[i].addEventListener('click', event => {
+          event.preventDefault();
+          tinder_action({'id': event.target.parentElement.parentElement.attributes['aria-valuenow'].value, 'action': event.target.className})
+      });
+    }
+
+    function tinder_action(data) {
+      fetch("{{tinder_action_url}}", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {"content-type": "application/json"},
+      }).then((resp) => resp.json())
+        .then((data) => {
+        delete data['X-Padding']
+        if (data.match){
+          alert('You have a new match')
+        }
+        get_next_profile()
+      });
+    }
+  </script>
 {% endblock %}
