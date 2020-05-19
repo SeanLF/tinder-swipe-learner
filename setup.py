@@ -11,5 +11,6 @@ setup(
         'tinder-token',
         'git+https://github.com/fbessez/Tinder/',
         'requests',
+        'face_recognition',
     ],
 )
