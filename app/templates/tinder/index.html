@@ -58,6 +58,14 @@
 
     function go_to_image(idx){
       index = Number(idx).mod(document.profile.photos.length); // in case
+
+      // clear active button 
+      selected = document.querySelector('button[aria-selected="true"]')
+      if (selected != null)
+        selected.removeAttribute('aria-selected')
+      
+      document.querySelector(`button[aria-colspan="${index}"]`).setAttribute('aria-selected', true)
+
       get_card().style = `background-image: url(${document.profile.photos[index]})`;
       get_card().setAttribute('aria-colindex', index);
       preload_next_image(index);
@@ -144,6 +152,8 @@
           case " ":
             right_button.click()
             break;
+          case "1":
+            go_to_image(0);
           default:
             return
           event.preventDefault();
@@ -183,6 +193,7 @@
       }).then((resp) => resp.json())
         .then((data) => {
         delete data['X-Padding']
+        console.log(data);
         if (data.match){
           alert('You have a new match')
         }

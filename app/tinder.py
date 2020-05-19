@@ -35,6 +35,13 @@ def load_globals():
     'photo': my_profile['photos'][0]['processedFiles'][3]
   }
 
+@bp.route('/matches', methods=['GET'])
+@login_required
+def matches():
+  page_token = request.args.get('next_page_token')
+  matches = tinder_api.matches(page_token=page_token)
+  return jsonify(matches)
+
 @bp.route('/action', methods=['POST'])
 @login_required
 def action():

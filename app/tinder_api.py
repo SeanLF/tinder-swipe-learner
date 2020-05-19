@@ -237,9 +237,11 @@ def match_info(match_id):
     except requests.exceptions.RequestException as e:
         print("Something went wrong. Could not get your match info:", e)
 
-def all_matches():
+def matches(page_token=None):
     try:
-        url = config.host + '/v2/matches'
+        url = config.host + '/v2/matches?count=60'
+        if page_token is not None:
+            url += '&page_token=%s' % page_token 
         r = requests.get(url, headers=headers)
         return r.json()
     except requests.exceptions.RequestException as e:

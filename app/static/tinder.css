@@ -55,6 +55,28 @@ body{
   color: var(--text-color-flipped);
   font-size: 0.8rem;
 }
+.aside-content{
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  overflow-y: scroll;
+}
+.match-card{
+  color: var(--text-color-flipped);
+  margin: 0.5rem;
+  background-repeat: no-repeat;
+  border-radius: 3px;
+  cursor: pointer;
+  transition-duration: .25s;
+  display: flex;
+  align-items: flex-end;
+}
+.match-card:hover{
+  transform: scale(1.1);
+}
+.match-card span{
+  padding: 5px;
+}
 /* MAIN APP */
 .main {
   position: relative;
@@ -95,6 +117,9 @@ body{
   border-radius: 1rem;
   margin: 0.1rem;
   cursor: pointer;
+}
+.photo-count-container > button[aria-selected="true"]{
+  opacity: 1;
 }
 .photo-buttons {
   visibility: hidden;
