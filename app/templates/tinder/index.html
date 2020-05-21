@@ -40,7 +40,8 @@
       fetch("{{tinder_fetch_profile_url}}")
       .then((resp) => resp.json())
       .then((data) => {
-        document.profile = data;
+        document.profiles = data;
+        document.current_profile = document.profiles[0]
         setup_profile()
       });
     }
@@ -51,13 +52,13 @@
     };
 
     function preload_next_image(idx){
-      index = Number(idx+1).mod(document.profile.photos.length); // in case
+      index = Number(idx+1).mod(document.current_profile.photos.length); // in case
       img=new Image();
-      img.src=document.profile.photos[index];
+      img.src=document.current_profile.photos[index];
     }
 
     function go_to_image(idx){
-      index = Number(idx).mod(document.profile.photos.length); // in case
+      index = Number(idx).mod(document.current_profile.photos.length); // in case
 
       // clear active button 
       selected = document.querySelector('button[aria-selected="true"]')
@@ -66,7 +67,7 @@
       
       document.querySelector(`button[aria-colspan="${index}"]`).setAttribute('aria-selected', true)
 
-      get_card().style = `background-image: url(${document.profile.photos[index]})`;
+      get_card().style = `background-image: url(${document.current_profile.photos[index]})`;
       get_card().setAttribute('aria-colindex', index);
       preload_next_image(index);
     }
@@ -94,7 +95,7 @@
 
     function setup_picture_carousel_buttons(){
       photo_count_container.innerHTML = ''
-      for(i=0;i<document.profile.photos.length; i++){
+      for(i=0;i<document.current_profile.photos.length; i++){
         el = document.createElement('button');
         el.setAttribute('aria-colspan', i);
         photo_count_container.appendChild(el);
@@ -107,19 +108,19 @@
     }
 
     function setup_profile(){
-      profile_el.setAttribute('aria-valuenow', document.profile.id)
+      profile_el.setAttribute('aria-valuenow', document.current_profile.id)
       setup_picture_carousel_buttons()
-      photo_count_container.setAttribute('aria-colcount', document.profile.photos.length);
+      photo_count_container.setAttribute('aria-colcount', document.current_profile.photos.length);
       go_to_image(0);
-      name_el.textContent = document.profile.name
-      age_el.textContent = document.profile.age
-      distance_el.textContent = document.profile.distance
-      bio_el.textContent = document.profile.bio
+      name_el.textContent = document.current_profile.name
+      age_el.textContent = document.current_profile.age
+      distance_el.textContent = document.current_profile.distance
+      bio_el.textContent = document.current_profile.bio
       // instagram set elements
-      if (document.profile.bio == ""){
+      if (document.current_profile.bio == ""){
         card_content.classList.add('hidden')
         bio_el.classList.add('hidden');
-      } else if (document.profile.bio != ""){
+      } else if (document.current_profile.bio != ""){
         card_content.classList.remove('hidden')
         bio_el.classList.remove('hidden');
       }
@@ -154,6 +155,7 @@
             break;
           case "1":
             go_to_image(0);
+            break;
           default:
             return
           event.preventDefault();
@@ -162,7 +164,7 @@
     }
 
     function __init__(){
-      document.profile = {{g.profile|tojson}};
+      document.current_profile = {{g.profile|tojson}};
       setup_profile()
 
       photo_buttons.addEventListener('click', (event) => {

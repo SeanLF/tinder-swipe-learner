@@ -1,17 +1,20 @@
-{% extends 'base.html' %}
+{% extends 'auth/base.html' %}
+
+{% block title %}Log In{% endblock %}
 
 {% block header %}
-  <h2>{% block title %}Log In{% endblock %}</h2>
 {% endblock %}
 
 {% block content %}
+  <h2>Log In</h2>
+
   <form method=post>
-    <div>
+    <div class=log-in-form>
       <label for=phone_number>Phone Number</label>
       <input type=tel name=phone_number id=phone_number required>
-    </div>
-    <div>
-      <input type=submit value=Submit>
+      <div class=submit_wrapper>
+        <input type=submit value=↑ class=submit>
+      </div>
     </div>
   </form>
 {% endblock %}

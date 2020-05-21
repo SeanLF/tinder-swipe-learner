@@ -1,7 +1,8 @@
-<!doctype html>
+<!doctype html lang='en'>
 <title>Tinder</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='tinder.css') }}">
+<meta charset="UTF-8">
 <aside class="aside">
   <nav>
     <div class="navbar">
@@ -43,8 +44,8 @@
     <div class="open-profile">⬆️ Open Profile</div>
     <div class="close-profile">⬇️ Close Profile</div>
     <div class="super-like">⏎ Super Like</div>
-    <div class="next-photo">1️⃣ 1st photo</div>
     <div class="next-photo">▭ Next photo</div>
+    <div class="next-photo">1️⃣ 1st photo</div>
   </div>
 </main>
 
@@ -52,13 +53,14 @@
   // --------- FETCHING DATA ---------
   function get_matches(){
     url = '/tinder/matches'
-    if (document.next_page_token != null)
-      url = `${url}?next_page_token=${document.next_page_token}`
+    // if (document.next_page_token != null)
+    //   url = `${url}?limit=${document.next_page_token}`
+      if (document.fetch_matches_limit != null)
+      url = `${url}?limit=${document.fetch_matches_limit}`
     fetch(url)
     .then((resp) => resp.json())
     .then((data) => {
-      document.matches = data.data.matches;
-      document.next_page_token = data.data.next_page_token;
+      document.match_profiles = data;
       setup_matches();
     });
   }
@@ -73,14 +75,15 @@
     navbar_messages.removeAttribute('aria-selected')
     navbar_matches.setAttribute('aria-selected', true)
     aside_content.innerHTML = ''
-    for (idx in document.matches){
+    for (idx in document.match_profiles){
       card = document.createElement('div')
       card.classList.add('match-card')
-      photo = document.matches[idx].person.photos[0].processedFiles[3]
-      card.style = `background-image: url(${photo.url}); width: ${photo.width}px; height:${photo.height}px;`
+      photo = document.match_profiles[idx].photos[0]//.processedFiles[3]
+      // card.style = `background-image: url(${photo.url}); width: ${photo.width}px; height:${photo.height}px;`
+      card.style = `background-image: url(${photo});`
       
       span = document.createElement('span')
-      span.textContent = document.matches[idx].person.name
+      span.textContent = document.match_profiles[idx].name
       card.appendChild(span)
       
       unseen_bubble = document.createElement('div')
@@ -94,6 +97,7 @@
   // --------- INIT ---------
   function init(){
     document.next_page_token = null;
+    document.fetch_matches_limit = 30;
     get_matches();
   }
 

@@ -6,7 +6,7 @@ body{
   width: 25vw;
   display: flex;
   flex-flow: column;
-  background-color: var(--background-color-card);
+  background-color: var(--background-color-content);
   position: fixed;
   height: 100vw;
 }
@@ -63,13 +63,17 @@ body{
 }
 .match-card{
   color: var(--text-color-flipped);
-  margin: 0.5rem;
+  margin-bottom: 0.5rem;
   background-repeat: no-repeat;
   border-radius: 3px;
   cursor: pointer;
   transition-duration: .25s;
   display: flex;
   align-items: flex-end;
+  background-size: 110%;
+  background-position: center;
+  width: 30%;
+  height: 130px;;
 }
 .match-card:hover{
   transform: scale(1.1);
@@ -80,7 +84,7 @@ body{
 /* MAIN APP */
 .main {
   position: relative;
-  width: 75vw;
+  width: 74vw;
   left: 25vw;
   border-left: 1px solid var(--border-color);
 }
@@ -168,7 +172,7 @@ body{
   cursor: pointer;
   font-size: 2rem;
   padding: 1rem;
-  background-color: var(--background-color-card);
+  background-color: var(--background-color-content);
   border-radius: 50%;
   width: 2.5rem;
   text-align: center;

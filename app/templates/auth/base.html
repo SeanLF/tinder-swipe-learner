@@ -1,0 +1,35 @@
+<!doctype html>
+<title>{% block title %}{% endblock %} - Tinder #machine-learning</title>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+</head>
+<body>
+  <header class="header">
+    <nav class="nav">
+      <div class="brand-bar">
+        <h1>Tinder #machine-learning</h1>
+      </div>
+      <div class="navigation-bar">
+        <a href="https://tinder.com">Official Tinder</a>
+        {% if g.user %}
+          <a href="{{ url_for('auth.logout') }}">Log Out</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">Log In</a>
+        {% endif %}
+      </div>
+    </nav>
+    {% block header %}{% endblock %}
+  </header>
+  <main class="main">
+    {% if g.user %}
+      <h2>Welcome {{ g.phone_number }}</h2>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+<footer class="footer">
+  <a href="https://tinder.com">Official Tinder</a>
+  <a href="https://seanfloyd.ca">Sean Floyd</a>
+</footer>
