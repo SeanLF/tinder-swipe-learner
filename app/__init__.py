@@ -1,5 +1,5 @@
 import os
-from flask import Flask, url_for, render_template
+from flask import Flask, url_for, render_template, redirect, g
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -21,19 +21,21 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from . import db
+    from database import db
     db.init_app(app)
 
-    from . import auth
+    from controllers import auth
     app.register_blueprint(auth.bp)
 
-    from . import tinder
+    from controllers import tinder
     app.register_blueprint(tinder.bp)
 
     app.add_url_rule('/', endpoint='index')
 
     @app.route('/')
+    @auth.login_required
     def index():
-        return render_template('index.html', otp_url=url_for('auth.sms_otp_code'), tinder_url=url_for('tinder.index'))
+        auth.refresh_api_token()
+        return redirect(url_for('tinder.index'))
 
     return app

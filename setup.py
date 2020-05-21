@@ -8,8 +8,7 @@ setup(
     zip_safe=False,
     install_requires=[
         'flask',
-        'tinder-token',
-        'git+https://github.com/fbessez/Tinder/',
+        'git+https://github.com/SeanLF/Tinder/',
         'requests',
         'face_recognition',
     ],
