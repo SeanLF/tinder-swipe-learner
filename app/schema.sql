@@ -5,5 +5,6 @@ CREATE TABLE users (
   photos BLOB,
   age TINYINT,
   bio TEXT,
-  class VARCHAR(10)
+  class VARCHAR(10),
+  likes_me INTEGER
 );
