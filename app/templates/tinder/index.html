@@ -1,28 +1,21 @@
 {% extends 'tinder/base.html' %}
 
 {% block cards %}
-  <div class="profile" aria-valuenow="{{g.profile.id}}">
-    <div class="card" style="background-image: url({{g.profile.photos[0]}});" aria-colindex="0"> <!-- should contain first image as background -->
+  <div class="profile" aria-valuenow="">
+    <div class="card" aria-colindex="0"> <!-- should contain first image as background -->
       <div class="photo-count-container"></div>
       <div class="photo-buttons">
         <div class="image-left">👈</div>
         <div class="image-right">👉</div>
       </div>
       <div class="card__header"> <!-- contains name, age, distance -->
-        <div class="name">{{g.profile.name}}</div>
-        <div class="age">{{g.profile.age}}</div>
-        <div class="distance">{{g.profile.distance}}</div>
+        <div class="name"></div>
+        <div class="age"></div>
+        <div class="distance"></div>
       </div>
-      <div class='card__content {% if g.profile.bio == "" and g.profile.instagram.photos == [] %}hidden{% endif %}'>
+      <div class='card__content hidden'>
         <details>
-          <div class='bio {% if g.profile.bio == "" %}hidden{% endif %}'>
-            {{g.profile.bio}}
-          </div>
-          <div class="instagram {% if g.profile.instagram.photos == [] %}hidden{% endif %}">
-            <div class="photo-container"> <!-- scrollable -->
-              <div class="instagram-photo">
-              </div>
-            </div>
+          <div class='bio hidden'>
           </div>
         </details> 
       </div>
@@ -36,14 +29,45 @@
   <script>
     // --------- GETTING DATA FROM TINDER ---------
 
-    function get_next_profile(){
+    function fetch_next_profiles(){
       fetch("{{tinder_fetch_profile_url}}")
-      .then((resp) => resp.json())
-      .then((data) => {
-        document.profiles = data;
-        document.current_profile = document.profiles[0]
-        setup_profile()
-      });
+        .then((resp) => resp.json())
+        .then((data) => {
+          current_length = 
+          document.profiles.concat(...data);
+          if (document.profile_set_up){
+            return undefined;
+          }
+          document.profile_set_up = true;
+          if (document.current_profile === undefined){
+            document.current_profile = document.profiles.shift();
+          }
+          setup_profile()
+        });
+    }
+
+    // --------- FETCHING LOGIC ---------
+
+    function get_next_profile(){
+      // pop the first element off of profiles (always one there, since we fetch more before it becomes empty)
+      document.current_profile = document.profiles.shift();
+      document.profile_set_up = false;
+      if (document.profiles.length < 2){
+        fetch_next_profiles();
+      }
+      if (document.current_profile === undefined || document.profile_set_up){
+        return undefined;
+      }
+      setup_profile();
+    }
+
+    function call_setup_profile(){
+      if (document.profile_set_up)
+        return null
+      if (document.current_profile != undefined){
+        document.profile_set_up = true;
+        setup_profile();
+      }
     }
 
     // --------- PRESENTATION LOGIC ---------
@@ -51,10 +75,14 @@
       return ((this%n)+n)%n;
     };
 
-    function preload_next_image(idx){
-      index = Number(idx+1).mod(document.current_profile.photos.length); // in case
+    function preload_image(url){
       img=new Image();
-      img.src=document.current_profile.photos[index];
+      img.src=url;
+    }
+
+    function preload_next_image(profile, idx){
+      index = Number(idx+1).mod(profile.photos.length); // in case
+      preload_image(profile.photos[index]);
     }
 
     function go_to_image(idx){
@@ -69,7 +97,7 @@
 
       get_card().style = `background-image: url(${document.current_profile.photos[index]})`;
       get_card().setAttribute('aria-colindex', index);
-      preload_next_image(index);
+      preload_next_image(document.current_profile, index);
     }
 
     function get_card(){
@@ -108,14 +136,14 @@
     }
 
     function setup_profile(){
-      profile_el.setAttribute('aria-valuenow', document.current_profile.id)
-      setup_picture_carousel_buttons()
+      profile_el.setAttribute('aria-valuenow', document.current_profile.id);
+      setup_picture_carousel_buttons();
       photo_count_container.setAttribute('aria-colcount', document.current_profile.photos.length);
       go_to_image(0);
-      name_el.textContent = document.current_profile.name
-      age_el.textContent = document.current_profile.age
-      distance_el.textContent = document.current_profile.distance
-      bio_el.textContent = document.current_profile.bio
+      name_el.textContent = document.current_profile.name;
+      age_el.textContent = document.current_profile.age;
+      distance_el.textContent = document.current_profile.distance;
+      bio_el.textContent = document.current_profile.bio;
       // instagram set elements
       if (document.current_profile.bio == ""){
         card_content.classList.add('hidden')
@@ -123,6 +151,10 @@
       } else if (document.current_profile.bio != ""){
         card_content.classList.remove('hidden')
         bio_el.classList.remove('hidden');
+      }
+
+      if (document.profiles[0] !== undefined){
+        preload_image(document.profiles[0].photos[0]);
       }
     }
 
@@ -164,7 +196,8 @@
     }
 
     function __init__(){
-      document.current_profile = {{g.profile|tojson}};
+      document.profiles = {{g.profiles|tojson}};
+      document.current_profile = document.profiles[0];
       setup_profile()
 
       photo_buttons.addEventListener('click', (event) => {

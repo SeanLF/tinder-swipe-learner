@@ -21,13 +21,13 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from database import db
+    from .database import db
     db.init_app(app)
 
-    from controllers import auth
+    from .controllers import auth
     app.register_blueprint(auth.bp)
 
-    from controllers import tinder
+    from .controllers import tinder
     app.register_blueprint(tinder.bp)
 
     app.add_url_rule('/', endpoint='index')

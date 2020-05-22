@@ -60,7 +60,8 @@
     fetch(url)
     .then((resp) => resp.json())
     .then((data) => {
-      document.match_profiles = data;
+      document.match_profiles = data[0];
+      document.matches_next_page_token = data[1];
       setup_matches();
     });
   }
@@ -78,9 +79,9 @@
     for (idx in document.match_profiles){
       card = document.createElement('div')
       card.classList.add('match-card')
-      photo = document.match_profiles[idx].photos[0]//.processedFiles[3]
+      photo = document.match_profiles[idx]['person']['photos'][0]['processedFiles'][2]['url']
       // card.style = `background-image: url(${photo.url}); width: ${photo.width}px; height:${photo.height}px;`
-      card.style = `background-image: url(${photo});`
+      card.style.backgroundImage = `url(${photo})`
       
       span = document.createElement('span')
       span.textContent = document.match_profiles[idx].name

@@ -3,9 +3,10 @@ import fileinput, re
 
 from flask import Blueprint, g, render_template, request, session, url_for, redirect
 
-from tinder_api import Tinder_API
+from ..helpers.tinder_api import Tinder_API_helper
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
+
 
 @bp.before_app_request
 def load_logged_in_user():
@@ -15,28 +16,35 @@ def load_logged_in_user():
             g.phone_number = session.get('phone_number')
 
 
+@bp.before_app_request
+def setup_tinder_api():
+    if bp.name in request.endpoint:
+        g.api_helper = Tinder_API_helper()
+
+
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
-  if request.method == 'GET':
-      return render_template('auth/sms.html')
-  else:
-      tinder_api = Tinder_API()
-      session['phone_number'] = request.form['phone_number']
-      tinder_api.send_otp_code(session.get('phone_number'))
-      return redirect(url_for('auth.sms_otp_code'))
+    if request.method == 'GET':
+        return render_template('auth/sms.html')
+    else:
+        session['phone_number'] = request.form['phone_number']
+    if g.api_helper.send_sms_otp(session['phone_number']):
+        return redirect(url_for('auth.sms_otp_code'))
+    else:
+        return redirect(url_for('auth.login'))      
 
 
 @bp.route('/login/sms_otp_code', methods=['GET', 'POST'])
 def sms_otp_code():
-  if request.method == 'GET':
-      return render_template('auth/sms_otp_code.html')
-  else:
-      # if code present, then user logging in, else only get new tinder token
-      if 'otp_code' in request.form:
-          otp_code = str(request.form['otp_code'])
-          session['refresh_token'] = Tinder_API().get_refresh_token(session.get('phone_number'), otp_code)
-      refresh_api_token()
-      return redirect(url_for('tinder.index'))
+    if request.method == 'GET':
+        return render_template('auth/sms_otp_code.html')
+    else:
+        # if code present, then user logging in, else only get new tinder token
+        if 'otp_code' in request.form:
+            otp_code = str(request.form['otp_code'])
+            session['refresh_token'] = g.api_helper.get_refresh_token(session.get('phone_number'), otp_code)
+        refresh_api_token()
+        return redirect(url_for('tinder.index'))
 
 
 @bp.route('/logout')
@@ -64,6 +72,5 @@ def refresh_api_token():
 
         # If we are past the expiration date of the token, renew it.
         if token_expiry_date <= now or session['tinder_token'] is None:
-            print('condition entered')
-            session['tinder_token'] = Tinder_API().get_api_token(session.get('refresh_token'))
+            session['tinder_token'] = g.api_helper.get_api_token(session.get('refresh_token'))
             session['tinder_token_exp_time'] = (now + one_day).isoformat()

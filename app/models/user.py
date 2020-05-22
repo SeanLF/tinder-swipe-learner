@@ -10,7 +10,7 @@ from sqlite3 import IntegrityError, Row
 
 from tinder_api import helpers as api_helpers
 
-from database import db
+from ..database import db
 
 
 # persist_tinder_profiles(profiles, likes_me=False)
@@ -21,26 +21,66 @@ from database import db
 # ->
 # User.set_klass(id, action)
 
-class User(object):
+class User(dict):
     def __init__(self, user):
       if type(user) is Row:
-        self.id = user['id']
-        self.name = None
-        self.age = user['age']
-        self.distance = None
-        self.photos = json.loads(user['photos'])
-        self.bio = user['bio']
-        self.likes_me = user['likes_me']
-        self.klass = user['klass']
+        dict.__init__(self,
+          id = user['id'],
+          name = None,
+          age = user['age'],
+          distance = None,
+          photos = json.loads(user['photos']),
+          bio = user['bio'],
+          likes_me = user['likes_me'],
+          klass = user['klass'],
+        )
       elif type(user) is dict: # API data
-        self.id = user.get('id', user.get('_id'))
-        self.name = user.get('name')
-        self.age = api_helpers.calculate_age(user.get('birth_date'))
-        self.distance = "%i km" % api_helpers.distance_in_km(user.get('distance_mi'))
-        self.photos = api_helpers.get_photos(user)
-        self.bio = user.get('bio')
-        self.likes_me = None
-        self.klass = None
+        distance = "%i km" % api_helpers.distance_in_km(user.get('distance_mi'))
+        user = user.get('user')
+        dict.__init__(self,
+          distance = distance,
+          # photos += [photo['url'] for photo in user['instagram']['photos']] not included anymore,
+          id = user.get('id', user.get('_id')),
+          name = user.get('name'),
+          age = api_helpers.calculate_age(user.get('birth_date')),
+          photos = api_helpers.get_photos(user),
+          bio = user.get('bio'),
+          likes_me = None,
+          klass = None,
+        )
+
+
+    def id(self):
+      import pdb; pdb.set_trace()
+      return self['id']
+
+
+    def name(self):
+      return self['name']
+
+
+    def age(self):
+      return self['age']
+
+
+    def distance(self):
+      return self['distance']
+
+
+    def photos(self):
+      return self['photos']
+
+
+    def bio(self):
+      return self['bio']
+
+
+    def likes_me(self):
+      return self['likes_me']
+
+
+    def klass(self):
+      return self['klass']
 
 
     @classmethod
@@ -80,8 +120,12 @@ class User(object):
     
     @classmethod
     def set_klass(cls, id, klass):
+      import pdb; pdb.set_trace()
       try:
-        db.execute('UPDATE users SET class = ? WHERE id = ?', (klass, id))
+        db.execute(
+          'UPDATE users SET class = ? WHERE id = ?',
+          (klass, id)
+        )
         db.commit()
       except IntegrityError as e:
         return str(e)

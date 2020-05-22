@@ -1,21 +1,25 @@
 import json
 from datetime import datetime
 
-from flask import Blueprint, g, render_template, request, url_for, jsonify
+from flask import Blueprint, g, render_template, request, url_for, jsonify, session
 
-from auth import login_required
-from helpers.tinder_api import Tinder_API_helper
-from models.user import User
+from .auth import login_required
+from ..helpers.tinder_api import Tinder_API_helper
+from ..models.user import User
 
 bp = Blueprint('tinder', __name__, url_prefix='/tinder')
 
-api_helper = Tinder_API_helper()
+
+@bp.before_app_request
+def setup_tinder_api():
+  if bp.name in request.endpoint:
+    g.api_helper = Tinder_API_helper(api_token=g.tinder_token)
 
 
 @bp.route('/')
 @login_required
 def index():
-  g.profile = api_helper.get_recommendations()
+  g.profiles = g.api_helper.get_recommendations()
   load_globals()
   return render_template('tinder/index.html', tinder_action_url=url_for('tinder.action'), tinder_fetch_profile_url=url_for('tinder.next_profile'))
 
@@ -31,15 +35,15 @@ def next_profile():
   if persisted or likes_me:
     return jsonify(User.query(limit=limit, offset=offset, likes_me=likes_me))
 
-  users = api_helper.get_recommendations(limit=limit)[0:limit]
+  users = g.api_helper.get_recommendations(limit=limit)[0:limit]
   return jsonify(users)
 
 
 @login_required
 def load_globals():
-  g.match_count = api_helper.get_match_count()
+  g.match_count = g.api_helper.get_match_count()
   g.message_count = 1
-  my_profile = api_helper.get_self()
+  my_profile = g.api_helper.get_profile()
   g.user_profile = {
     'id': my_profile['_id'],
     'name': my_profile['name'],
@@ -51,15 +55,15 @@ def load_globals():
 @login_required
 def get_matches():
   page_token = request.args.get('next_page_token', None)
-  limit = request.args.get('limit', 10)
-  return jsonify(api_helper.get_matches(limit=limit, page_token=page_token))
+  limit = int(request.args.get('limit', 10))
+  return jsonify(g.api_helper.get_matches(limit=limit, page_token=page_token))
 
 
 @bp.route('/action', methods=['POST'])
 @login_required
 def action():
   data = request.get_json()
-  return jsonify(api_helper.act_on_user(data['id'], data['action']))
+  return jsonify(g.api_helper.act_on_user(data['id'], data['action']))
 
 
 @bp.route('/action/custom', methods=['GET', 'POST'])
@@ -74,4 +78,4 @@ def custom_action():
     endpoint = data['endpoint']
     del data['endpoint']
 
-  return jsonify(api_helper.custom_api_call(endpoint, http_verb=http_verb, data=data))
+  return jsonify(g.api_helper.custom_api_call(endpoint, http_verb=http_verb, data=data))
