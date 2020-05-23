@@ -9,9 +9,11 @@
         <div class="image-right">👉</div>
       </div>
       <div class="card__header"> <!-- contains name, age, distance -->
-        <div class="name"></div>
-        <div class="age"></div>
-        <div class="distance"></div>
+        <div class="name_and_age">
+          <div class="name"></div>
+          <div class="age"></div>
+        </div>
+        <div class="distance-container"><span class="distance-icon">📍</span><span class="distance"></span></div>
       </div>
       <div class='card__content hidden'>
         <details>
@@ -21,9 +23,9 @@
       </div>
     </div>
     <div class="actions">
-      <div class="dislike">🙅‍♂️</div>
-      <div class="superlike">😍</div>
-      <div class="like">👍</div>
+      <div class="dislike action">🙅‍♂️</div>
+      <div class="superlike action">😍</div>
+      <div class="like action">👍</div>
     </div>
   </div>
   <script>
@@ -33,8 +35,7 @@
       fetch("{{tinder_fetch_profile_url}}")
         .then((resp) => resp.json())
         .then((data) => {
-          current_length = 
-          document.profiles.concat(...data);
+          document.profiles = document.profiles.concat(...data);
           if (document.profile_set_up){
             return undefined;
           }
@@ -42,7 +43,7 @@
           if (document.current_profile === undefined){
             document.current_profile = document.profiles.shift();
           }
-          setup_profile()
+          setup_profile();
         });
     }
 
@@ -142,7 +143,7 @@
       go_to_image(0);
       name_el.textContent = document.current_profile.name;
       age_el.textContent = document.current_profile.age;
-      distance_el.textContent = document.current_profile.distance;
+      distance_el.textContent = document.current_profile.distance + ' away';
       bio_el.textContent = document.current_profile.bio;
       // instagram set elements
       if (document.current_profile.bio == ""){
@@ -197,7 +198,7 @@
 
     function __init__(){
       document.profiles = {{g.profiles|tojson}};
-      document.current_profile = document.profiles[0];
+      document.current_profile = document.profiles.shift();
       setup_profile()
 
       photo_buttons.addEventListener('click', (event) => {
@@ -212,7 +213,7 @@
 
     // --------- ACTIONS ---------
 
-    actions = document.getElementsByClassName('actions');
+    actions = document.getElementsByClassName('action');
     for(i=0; i<actions.length; i++){
       actions[i].addEventListener('click', event => {
           event.preventDefault();
@@ -232,8 +233,8 @@
         if (data.match){
           alert('You have a new match')
         }
-        get_next_profile()
       });
+      get_next_profile()
     }
   </script>
 {% endblock %}

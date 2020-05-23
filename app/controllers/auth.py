@@ -3,7 +3,7 @@ import fileinput, re
 
 from flask import Blueprint, g, render_template, request, session, url_for, redirect
 
-from ..helpers.tinder_api import Tinder_API_helper
+from ..helpers.tinder_api_helper import Tinder_API_helper
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -18,7 +18,7 @@ def load_logged_in_user():
 
 @bp.before_app_request
 def setup_tinder_api():
-    if bp.name in request.endpoint:
+    if bp.name in request.endpoint or request.endpoint == 'index':
         g.api_helper = Tinder_API_helper()
 
 

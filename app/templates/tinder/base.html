@@ -1,106 +1,118 @@
 <!doctype html lang='en'>
-<title>Tinder</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='tinder.css') }}">
-<meta charset="UTF-8">
-<aside class="aside">
-  <nav>
-    <div class="navbar">
-      <div class="my-profile">
-        <img src="{{g.user_profile['photo']['url']}}" alt="My Profile" height="{{g.user_profile['photo']['height']}}" width="{{g.user_profile['photo']['width']}}">
-        <span class="my-profile__header">My Profile</span>
+<head>
+  <title>Tinder</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='tinder.css') }}">
+  <meta charset="UTF-8">
+</head>
+<body>
+  <aside class="aside">
+    <nav class="nav">
+      <div class="navbar">
+        <div class="my-profile">
+          <img src="{{g.user_profile['photo']['url']}}" alt="My Profile" height="{{g.user_profile['photo']['height']}}" width="{{g.user_profile['photo']['width']}}">
+          <span class="my-profile__header">My Profile</span>
+        </div>
       </div>
-    </div>
-    <div class="aside-navbar">
-      <div class="matches" aria-selected="true">
-        <span>Matches</span>
-        {% if g.match_count > 0 %}
-          {% if g.match_count == 99 %}
-            <span class="match-count">99+</span>
-          {% else %}
-            <span class="match-count">{{g.match_count}}<0pan>
+      <div class="aside-navbar">
+        <div class="matches" aria-selected="true">
+          <span>Matches</span>
+          {% if g.match_count > 0 %}
+            {% if g.match_count == 99 %}
+              <span class="match-count">99+</span>
+            {% else %}
+              <span class="match-count">{{g.match_count}}<span>
+            {% endif %}
           {% endif %}
-        {% endif %}
+        </div>
+        <div class="messages">
+          <span>Messages</span>
+          {% if g.message_count > 0 %}
+          <span class="message-count">{{g.message_count}}</span>
+          {% endif %}
+        </div>
       </div>
-      <div class="messages">
-        <span>Messages</span>
-        {% if g.message_count > 0 %}
-        <span class="message-count">{{g.message_count}}</span>
-        {% endif %}
-      </div>
+    </nav>
+    <div class="aside-content">
+  
     </div>
-  </nav>
-  <div class="aside-content">
-
-  </div>
-</aside>
-<main class="main">
-  <div class="card-container">
-    {% block cards %}{% endblock %}
-  </div>
-  <div class="keyboard-shortcuts">
-    <div class="nope">⬅️ Nope</div>
-    <div class="like">➡️ Like</div>
-    <div class="open-profile">⬆️ Open Profile</div>
-    <div class="close-profile">⬇️ Close Profile</div>
-    <div class="super-like">⏎ Super Like</div>
-    <div class="next-photo">▭ Next photo</div>
-    <div class="next-photo">1️⃣ 1st photo</div>
-  </div>
-</main>
-
-<script>
-  // --------- FETCHING DATA ---------
-  function get_matches(){
-    url = '/tinder/matches'
-    // if (document.next_page_token != null)
-    //   url = `${url}?limit=${document.next_page_token}`
-      if (document.fetch_matches_limit != null)
-      url = `${url}?limit=${document.fetch_matches_limit}`
-    fetch(url)
-    .then((resp) => resp.json())
-    .then((data) => {
-      document.match_profiles = data[0];
-      document.matches_next_page_token = data[1];
-      setup_matches();
-    });
-  }
-
-  // --------- PRESENTATION LOGIC ---------
-  aside_navbar = document.getElementsByClassName('aside-navbar')[0]
-  navbar_matches = aside_navbar.children[0]
-  navbar_messages = aside_navbar.children[1]
-  aside_content = document.getElementsByClassName('aside-content')[0]
-
-  function setup_matches(){
-    navbar_messages.removeAttribute('aria-selected')
-    navbar_matches.setAttribute('aria-selected', true)
-    aside_content.innerHTML = ''
-    for (idx in document.match_profiles){
-      card = document.createElement('div')
-      card.classList.add('match-card')
-      photo = document.match_profiles[idx]['person']['photos'][0]['processedFiles'][2]['url']
-      // card.style = `background-image: url(${photo.url}); width: ${photo.width}px; height:${photo.height}px;`
-      card.style.backgroundImage = `url(${photo})`
-      
-      span = document.createElement('span')
-      span.textContent = document.match_profiles[idx].name
-      card.appendChild(span)
-      
-      unseen_bubble = document.createElement('div')
-      unseen_bubble.classList.add('unseen-match')
-      card.appendChild(unseen_bubble)
-
-      aside_content.appendChild(card)
+  </aside>
+  <main class="main">
+    <div class="card-container">
+      {% block cards %}{% endblock %}
+    </div>
+    <div class="keyboard-shortcuts">
+      <div class="nope">⬅️ Nope</div>
+      <div class="super-like">⏎ Super Like</div>
+      <div class="like">➡️ Like</div>
+      <div class="open-profile">⬆️ Open Profile</div>
+      <div class="close-profile">⬇️ Close Profile</div>
+      <div class="next-photo">▭ Next photo</div>
+      <div class="next-photo">1️⃣ 1st photo</div>
+    </div>
+  </main>
+  
+  <script>
+    // --------- FETCHING DATA ---------
+    function get_matches(){
+      url = '/tinder/matches'
+      // if (document.next_page_token != null)
+      //   url = `${url}?limit=${document.next_page_token}`
+        if (document.fetch_matches_limit != null)
+        url = `${url}?limit=${document.fetch_matches_limit}`
+      fetch(url)
+      .then((resp) => resp.json())
+      .then((data) => {
+        document.match_profiles = data[0];
+        document.matches_next_page_token = data[1];
+        setup_matches();
+      });
     }
-  }
-
-  // --------- INIT ---------
-  function init(){
-    document.next_page_token = null;
-    document.fetch_matches_limit = 30;
-    get_matches();
-  }
-
-  init()
-</script>
+  
+    // --------- PRESENTATION LOGIC ---------
+    aside_navbar = document.getElementsByClassName('aside-navbar')[0]
+    navbar_matches = aside_navbar.children[0]
+    navbar_messages = aside_navbar.children[1]
+    aside_content = document.getElementsByClassName('aside-content')[0]
+  
+    function setup_matches(){
+      navbar_messages.removeAttribute('aria-selected')
+      navbar_matches.setAttribute('aria-selected', true)
+      aside_content.innerHTML = ''
+      for (i =0; i< 5; i++){
+      for (idx in document.match_profiles){
+        card = document.createElement('div')
+        card.classList.add('match-card')
+        
+        div = document.createElement('div')
+        photo = document.match_profiles[idx]['person']['photos'][0]['processedFiles'][2]['url']
+  
+        div.textContent = document.match_profiles[idx].name
+        // card.style = `background-image: url(${photo.url}); width: ${photo.width}px; height:${photo.height}px;`
+        div.style.backgroundImage = `url(${photo})`
+        div.classList.add('match-card__content')
+  
+        span = document.createElement('span');
+        span.textContent = document.match_profiles[idx].person.name;
+        div.appendChild(span);
+        
+        card.appendChild(div)
+        
+        unseen_bubble = document.createElement('div')
+        unseen_bubble.classList.add('unseen-match')
+        card.appendChild(unseen_bubble)
+  
+        aside_content.appendChild(card)
+      }}
+    }
+  
+    // --------- INIT ---------
+    function init(){
+      document.next_page_token = null;
+      document.fetch_matches_limit = 30;
+      get_matches();
+    }
+  
+    init()
+  </script>
+</body>

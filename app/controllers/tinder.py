@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Blueprint, g, render_template, request, url_for, jsonify, session
 
 from .auth import login_required
-from ..helpers.tinder_api import Tinder_API_helper
+from ..helpers.tinder_api_helper import Tinder_API_helper
 from ..models.user import User
 
 bp = Blueprint('tinder', __name__, url_prefix='/tinder')
@@ -35,7 +35,7 @@ def next_profile():
   if persisted or likes_me:
     return jsonify(User.query(limit=limit, offset=offset, likes_me=likes_me))
 
-  users = g.api_helper.get_recommendations(limit=limit)[0:limit]
+  users = g.api_helper.get_recommendations()
   return jsonify(users)
 
 

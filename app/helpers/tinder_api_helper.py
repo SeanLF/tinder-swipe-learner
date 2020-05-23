@@ -5,14 +5,19 @@ Tinder API wrapper
 
 An instance of this class represents a user in the database
 '''
-from flask import g
+from threading import Thread
 
+# from tinder_api import Tinder_API
+from ..providers.fake_tinder_api import Tinder_API
+import tinder_api.helpers as api_helpers
+
+from ..database.db import get_db
+from .db_helper import DB_Helper
 from ..models.user import User
 
 
 class Tinder_API_helper(object):
     def __init__(self, **kwargs):
-      from tinder_api import Tinder_API
       self._tinder_api = Tinder_API(**kwargs)
 
 
@@ -40,19 +45,16 @@ class Tinder_API_helper(object):
       users = [User(user) for user in users_dict]
 
       # in a separate thread, persist users
-      from threading import Thread
-      t = Thread(target=lambda users: map(lambda user: user.save(), users), args=(users))
-      t.start()
+      DB_Helper().save_users(users)
 
       return users
 
 
     def act_on_user(self, user_id, action):
-      response = self._tinder_api.dislike(id) if action == 'dislike' else self._tinder_api.like(id)
+      response = self._tinder_api.dislike(user_id) if action == 'dislike' else self._tinder_api.like(user_id)
 
       # in a separate thread, persist action
-      from threading import Thread
-      t = Thread(target=lambda User, id, klass: User.set_klass(id, klass), args=(User, user_id, action))
+      t = Thread(target=lambda db_helper, user_id, klass: db_helper.set_user_klass(user_id, klass), args=(DB_Helper(get_db()), user_id, action))
       t.start()
 
       return response
@@ -63,12 +65,12 @@ class Tinder_API_helper(object):
       response_data = response.get('data', {})
       
       matches = response_data.get('matches')
+      # matches_for_db = [User(match.get('person')) for match in api_helpers.format_matches(matches)]
       next_page_token = response_data.get('next_page_token', None)
 
+
       # in a separate thread, persist users
-      from threading import Thread
-      t = Thread(target=lambda User, matches: map(lambda match: User(match.get('person').save()), matches), args=(User, matches))
-      t.start()
+      DB_Helper() #matches
 
       # if next_page_token is not None and len(matches) < limit:
       #   missing = limit - len(matches)
