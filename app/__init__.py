@@ -5,7 +5,6 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'tinder.sqlite'),
     )
 
     if test_config is None:
@@ -21,13 +20,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from .database import db
-    db.init_app(app)
-
-    from .controllers import auth
+    from app.controllers import auth
     app.register_blueprint(auth.bp)
 
-    from .controllers import tinder
+    from app.controllers import tinder
     app.register_blueprint(tinder.bp)
 
     app.add_url_rule('/', endpoint='index')
