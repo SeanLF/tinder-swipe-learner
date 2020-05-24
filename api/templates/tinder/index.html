@@ -152,7 +152,6 @@
         ig_photos = document.current_profile.instagram.photos.map(photo => photo['image']);
         document.current_profile.photos = document.current_profile.photos.concat(...ig_photos);
       }
-      debugger
       profile_el.setAttribute('aria-valuenow', document.current_profile.user.id);
       setup_picture_carousel_buttons();
       photo_count_container.setAttribute('aria-colcount', document.current_profile.photos.length);
@@ -220,7 +219,6 @@
       });
 
       initialize_keyboard_event_listeners();
-      debugger;
       if (document.profiles === null || document.profiles === [] || document.profiles.length === 0){
         document.profiles = [];
       }

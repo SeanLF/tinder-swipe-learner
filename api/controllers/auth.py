@@ -3,7 +3,7 @@ import fileinput, re
 
 from flask import Blueprint, g, render_template, request, session, url_for, redirect
 
-from app.helpers import Tinder_API_helper
+from api.helpers import Tinder_API_helper
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 

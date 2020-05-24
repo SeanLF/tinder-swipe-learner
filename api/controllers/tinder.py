@@ -3,8 +3,8 @@ from datetime import datetime
 
 from flask import Blueprint, g, render_template, request, url_for, jsonify, session
 
-from app.controllers.auth import login_required
-from app.helpers import Tinder_API_helper
+from api.controllers.auth import login_required
+from api.helpers import Tinder_API_helper
 
 bp = Blueprint('tinder', __name__, url_prefix='/tinder')
 
@@ -26,16 +26,7 @@ def index():
 @bp.route('/recommendations', methods=['GET'])
 @login_required
 def next_profile():
-  likes_me = 'likes_me' in request.args
-  persisted = 'persisted' in request.args
-  limit = int(request.args.get('limit', 10))
-  offset = int(request.args.get('offset', 0))
-
-  if persisted or likes_me:
-    return jsonify(User.query(limit=limit, offset=offset, likes_me=likes_me))
-
-  users = g.api_helper.get_recommendations()
-  return jsonify(users)
+  return jsonify(g.api_helper.get_recommendations())
 
 
 @login_required

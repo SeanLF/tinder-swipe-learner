@@ -20,10 +20,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from app.controllers import auth
+    from api.controllers import auth
     app.register_blueprint(auth.bp)
 
-    from app.controllers import tinder
+    from api.controllers import tinder
     app.register_blueprint(tinder.bp)
 
     app.add_url_rule('/', endpoint='index')
