@@ -12,7 +12,7 @@ htmlcov/
 dist/
 build/
 *.egg-info/
-.vscode
+.vscode/
 
 *.sqlite
 fake_tinder_api.py

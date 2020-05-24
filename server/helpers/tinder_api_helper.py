@@ -6,7 +6,7 @@ Tinder API wrapper
 An instance of this class represents a user in the database
 '''
 
-from api.providers import Tinder_API
+from server.providers import Tinder_API
 import tinder_api.helpers as api_helpers
 
 

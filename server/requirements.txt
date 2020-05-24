@@ -1,5 +1,6 @@
 pylint
 flask
+Flask-Cors
 git+https://github.com/SeanLF/Tinder/
 requests
 face_recognition

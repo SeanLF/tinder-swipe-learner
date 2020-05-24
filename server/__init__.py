@@ -1,10 +1,12 @@
 import os
 from flask import Flask, url_for, render_template, redirect, g
+from flask_cors import CORS
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
+        FLASK_ENV='development',
     )
 
     if test_config is None:
@@ -13,6 +15,8 @@ def create_app(test_config=None):
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
+    
+    CORS(app, resources={r'/*': {'origins': '*'}})
 
     # ensure the instance folder exists
     try:
@@ -20,10 +24,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    from api.controllers import auth
+    from server.controllers import auth
     app.register_blueprint(auth.bp)
 
-    from api.controllers import tinder
+    from server.controllers import tinder
     app.register_blueprint(tinder.bp)
 
     app.add_url_rule('/', endpoint='index')
