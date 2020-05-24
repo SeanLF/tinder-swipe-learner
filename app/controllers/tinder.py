@@ -3,9 +3,8 @@ from datetime import datetime
 
 from flask import Blueprint, g, render_template, request, url_for, jsonify, session
 
-from .auth import login_required
-from ..helpers.tinder_api_helper import Tinder_API_helper
-from ..models.user import User
+from app.controllers.auth import login_required
+from app.helpers import Tinder_API_helper
 
 bp = Blueprint('tinder', __name__, url_prefix='/tinder')
 
