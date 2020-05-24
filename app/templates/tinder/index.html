@@ -136,26 +136,42 @@
       }
     }
 
+    function miles_to_km(miles) {
+      ONE_MILE_IN_KM = 1.60934;
+      return miles*ONE_MILE_IN_KM;
+    }
+
+    function dob_to_age(dob){
+      return (new Date()).getFullYear() - parseInt(dob.substr(0, 4));
+
+    }
+
     function setup_profile(){
-      profile_el.setAttribute('aria-valuenow', document.current_profile.id);
+      document.current_profile.photos = document.current_profile.user.photos.map(photo => photo.url);
+      if (document.current_profile.instagram !== undefined && document.current_profile.instagram.media_count > 0){
+        ig_photos = document.current_profile.instagram.photos.map(photo => photo['image']);
+        document.current_profile.photos = document.current_profile.photos.concat(...ig_photos);
+      }
+      debugger
+      profile_el.setAttribute('aria-valuenow', document.current_profile.user.id);
       setup_picture_carousel_buttons();
       photo_count_container.setAttribute('aria-colcount', document.current_profile.photos.length);
       go_to_image(0);
-      name_el.textContent = document.current_profile.name;
-      age_el.textContent = document.current_profile.age;
-      distance_el.textContent = document.current_profile.distance + ' away';
-      bio_el.textContent = document.current_profile.bio;
+      name_el.textContent = document.current_profile.user.name;
+      age_el.textContent = dob_to_age(document.current_profile.user.birth_date);
+      distance_el.textContent = `${Math.round(miles_to_km(document.current_profile.distance_mi))} km away`;
+      bio_el.textContent = document.current_profile.user.bio;
       // instagram set elements
-      if (document.current_profile.bio == ""){
+      if (document.current_profile.user.bio == ""){
         card_content.classList.add('hidden')
         bio_el.classList.add('hidden');
-      } else if (document.current_profile.bio != ""){
+      } else if (document.current_profile.user.bio != ""){
         card_content.classList.remove('hidden')
         bio_el.classList.remove('hidden');
       }
 
       if (document.profiles[0] !== undefined){
-        preload_image(document.profiles[0].photos[0]);
+        preload_image(document.profiles[0].user.photos[0]['url']);
       }
     }
 
@@ -197,19 +213,27 @@
     }
 
     function __init__(){
-      document.profiles = {{g.profiles|tojson}};
-      document.current_profile = document.profiles.shift();
-      setup_profile()
-
+      document.profiles = JSON.parse(localStorage.getItem('profiles'));
       photo_buttons.addEventListener('click', (event) => {
         direction = event.target == left_button ? -1 : 1;
         go_to_image(get_current_image_index() + direction)
       });
 
       initialize_keyboard_event_listeners();
+      debugger;
+      if (document.profiles === null || document.profiles === [] || document.profiles.length === 0){
+        document.profiles = [];
+      }
+      get_next_profile();
+
+      // save data when user closes the window
+      window.onbeforeunload = function(){
+        document.profiles.unshift(document.current_profile);
+        localStorage.setItem('profiles', JSON.stringify(document.profiles));
+      }
     }
 
-      __init__();
+    __init__();
 
     // --------- ACTIONS ---------
 
