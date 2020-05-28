@@ -18,6 +18,16 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
   },
+  {
+    path: '/login/sms',
+    name: 'Login via SMS',
+    component: () => import('../views/auth/SMS.vue'),
+  },
+  {
+    path: '/tinder',
+    name: 'Tinder #machine learning',
+    component: () => import('../views/Tinder.vue'),
+  },
 ];
 
 const router = new VueRouter({
