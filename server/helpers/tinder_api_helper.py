@@ -18,7 +18,7 @@ class Tinder_API_helper(object):
     # Authentication
 
     def send_sms_otp(self, phone_number):
-      return self._tinder_api.send_otp_code(phone_number).get('data').get('sms_sent')
+      return self._tinder_api.send_otp_code(phone_number)
 
 
     def get_refresh_token(self, phone_number, otp_code):
