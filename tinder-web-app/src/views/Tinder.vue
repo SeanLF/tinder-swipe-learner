@@ -40,6 +40,7 @@ export default {
   data: () => ({
     apiHostUrl: 'http://localhost:5000',
     apiToken: null,
+    refreshDate: null,
     loading: {
       recommendations: false,
       matches: false,
@@ -59,7 +60,8 @@ export default {
   }),
   created() {
     this.apiToken = JSON.parse(localStorage.getItem('apiToken'));
-    if (this.apiToken === null) {
+    this.refreshDate = JSON.parse(localStorage.getItem('refreshDate'));
+    if (this.apiToken === null || ) {
       this.$router.push('/login/sms');
     } else {
       this.fetchData();
@@ -98,7 +100,6 @@ export default {
         this.fetchRecommendations();
       }
       this.fetchMatches();
-      this.fetchMessages();
     },
     fetchProfile() {
       fetch(`${this.apiHostUrl}/tinder/profile`, {
@@ -146,9 +147,10 @@ export default {
       this.matches = matches.concat(...(dataMatches));
       this.pageToken = pageToken;
       this.loading.matches = false;
+      this.setMessages();
     },
-    fetchMessages() {
-      this.messages = [];
+    setMessages() {
+      this.messages = this.matches.map((m) => m.messages).filter((m) => m.length > 0);
       this.loading.messages = false;
     },
     swipe(swipeDirection) {

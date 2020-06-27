@@ -1,28 +1,22 @@
 <template>
-  <div class='sms'>
-    <Header></Header>
-    <main class='main'>
-      <div class="error" v-if="error !== null">{{error}}</div>
-      <SingleInputForm
-        v-bind:form=currentView
-        v-on:submit="submit"
-      ></SingleInputForm>
-    </main>
-    <Footer></Footer>
-  </div>
+  <DefaultLayout>
+    <div class="error" v-if="error !== null">{{error}}</div>
+    <SingleInputForm
+      v-bind:form=currentView
+      v-on:submit="submit"
+    ></SingleInputForm>
+  </DefaultLayout>
 </template>
 
 <script>
-import Header from '@/components/Header.vue';
+import DefaultLayout from '@/components/DefaultLayout.vue';
 import SingleInputForm from '@/components/SingleInputForm.vue';
-import Footer from '@/components/Footer.vue';
 
 export default {
   name: 'LoginViaSMS',
   components: {
-    Header,
+    DefaultLayout,
     SingleInputForm,
-    Footer,
   },
   data: () => ({
     error: null,
@@ -65,8 +59,16 @@ export default {
         body = { phone_number: this.phoneNumber, otp_code: event.target[0].value };
         callback = this.submittedOTP;
       }
-      fetch(`${this.apiHostUrl}/${this.currentView.action}`, {
-        method: this.currentView.method,
+      this.fetch(
+        `${this.apiHostUrl}/${this.currentView.action}`,
+        this.currentView.method,
+        body,
+        callback,
+      );
+    },
+    fetch(url, method, body, callback) {
+      fetch(url, {
+        method,
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
       }).then((resp) => resp.json())
@@ -83,6 +85,8 @@ export default {
       if ('refresh_token' in data) {
         localStorage.setItem('refreshToken', JSON.stringify(data.refresh_token));
         localStorage.setItem('apiToken', JSON.stringify(data.api_token));
+        
+        localStorage.setItem('refreshDate', (Date.now() + 24 * 3600000).toJSON());
         this.$router.push('/Tinder');
       } else {
         this.error = 'An error occured. Please try again.';
