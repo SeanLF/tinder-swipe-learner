@@ -1,0 +1,27 @@
+# Required minimum dip version
+version: "4.1"
+
+environment:
+  COMPOSE_EXT: development
+
+compose:
+  files:
+    - docker-compose.yml
+  project_name: tinder-client
+
+interaction:
+  yarn:
+    description: Run yarn commands
+    service: app
+    command: yarn
+    subcommands:
+      serve:
+        description: Serve Vue.js app at http://localhost:3000
+        service: serve
+        compose:
+          run_options: [service-ports, use-aliases]
+
+provision:
+  - dip compose down --volumes
+  - docker-compose up -d --build app
+  - dip yarn

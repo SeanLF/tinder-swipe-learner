@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  app: &app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tinder-client:1.0.0
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app:cached
+
+  serve:
+    <<: *app
+    command: yarn serve
+    ports:
+      - "8080:8080"
