@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  app: &app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PYTHON_VERSION: "3.8"
+    image: tinder-middleman-server:1.0.0
+    tmpfs:
+      - /tmp
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app/server:cached
+
+  runner:
+    <<: *app
+    command: /bin/bash
+    ports:
+      - "5000:5000"
+
+  web:
+    <<: *app
+    command: flask run -h 0.0.0.0
+    ports:
+      - "5000:5000"

@@ -1,0 +1,36 @@
+# Required minimum dip version
+version: "4.1"
+
+environment:
+  COMPOSE_EXT: development
+
+compose:
+  files:
+    - docker-compose.yml
+  project_name: tinder-server
+
+interaction:
+  bash:
+    description: Open the Bash shell in app's container
+    service: app
+    command: bash
+
+  pip:
+    description: Run pip commands
+    service: app
+    command: pip install -r requirements.txt
+  
+  flask:
+    description: Run flask commands
+    service: app
+    command: flask
+    subcommands:
+      run:
+        description: run flask app
+        service: web
+        compose:
+          run_options: [service-ports, use-aliases]
+
+provision:
+  - dip compose down --volumes
+  - docker-compose up -d --build app
